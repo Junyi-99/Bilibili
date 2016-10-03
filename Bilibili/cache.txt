@@ -1,0 +1,1 @@
+{"status":true,"ts":1475510580,"data":{"code":0,"crossDomain":"http://passport.bilibili.cn/crossDomain?DedeUserID=26198332&DedeUserID__ckMd5=6b822820bd58bc83&Expires=2592000&SESSDATA=466eb993%2C1478102580%2C2c9766f3&gourl=https%3A%2F%2Fpassport.bilibili.com%2Fajax%2FminiLogin%2Fredirect"}}
