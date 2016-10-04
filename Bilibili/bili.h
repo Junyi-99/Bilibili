@@ -64,20 +64,41 @@ public:
 		int time_start;
 		int time_end;
 	}currentTask;
-	
+	struct GiftBag
+	{
+		int id;
+		int uid;
+		int giftID;
+		int giftNum;
+		int expireat;
+
+	}giftBag;
 	int Login(const string username, const string password);
-	int GetUserInfoLive(LiveInfo &l);
-	int GetSignInfo(SignInfo &s);
-	int GetLiveRoomInfo(LiveRoomInfo &lr);
-	bili();
+	int FreshUserInfo();
+	int ExchangeSilver2Coin();
+	int GetUserID();
+	bool getLoginStatus() { return isLogin_; };
+	void setLoginStatus(bool status) { isLogin_ = status; };
+	wstring GetUserNameByUID(int UID);
+	string GetUsername()const { return username_; };
+	string GetUname()const { return uname; };
+	bili() { isLogin_ = false; };
 	~bili();
 	
-private:
-	string CheckLogin();
+protected:
 	int GetMasterID(int liveRoomID);//Get RUID
+	string uname;
+	string username_;
+	bool isLogin_;
+	string CheckLogin();
 	string cookieFile;
 	string cacheFile;
-	string uname;
 	Founctions f;
+private:
+
+	int GetUserInfoLive(LiveInfo &l);
+	int GetUserInfoAV(AVInfo &a);
+	int GetSignInfo(SignInfo &s);
+	int GetLiveRoomInfo(LiveRoomInfo &lr);
 	
 };
