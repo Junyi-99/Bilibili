@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Live.h"
-
 int Live::DoSign()
 {
 	wstring ret = f.HttpGetWithoutProp("http://live.bilibili.com/sign/doSign", cacheFile.c_str(), cookieFile.c_str());

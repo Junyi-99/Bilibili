@@ -7,8 +7,9 @@
 #include <codecvt>
 #include <ctime>
 #include <vector>
+#include "CaptchaRecognition.h"
 using namespace std;
-class Founctions
+class Founctions : public CaptchaRecognition
 {
 public:
 	string UrlEncode(const string& szToEncode);

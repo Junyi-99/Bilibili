@@ -2,6 +2,7 @@
 #include "Founctions.h"
 #include <fstream>
 #include <windows.h> 
+
 using namespace std;
 //×Ö·û´®·Ö¸îº¯Êý
 std::vector<std::string> Founctions::split(std::string str, std::string pattern)

@@ -2,12 +2,18 @@
 #include <stdio.h>
 #include "bili.h"
 #include "Live.h"
-#include "Picture.h"
 #include "Founctions.h"
 #include <vector>
 using namespace std;
 vector <Live> l;
 Founctions f;
+void debugMode()
+{
+	cout << f.getCaptchaValue("C:\\Users\\Junyi\\Desktop\\1.jpg") << endl;
+	cout << f.getCaptchaValue("C:\\Users\\Junyi\\Desktop\\2.jpg") << endl;
+	cout << f.getCaptchaValue("C:\\Users\\Junyi\\Desktop\\3.jpg") << endl;
+	printf("> ");
+}
 void setColor(const char* color)
 {
 	if (!strcmp(color, "white"))
@@ -55,6 +61,7 @@ void printHelp()
 {
     printHeader();
     printf("\n\
+  > home   \t\t\t 回到主页面     \n\
   > new <username> <password>  \t 添加一个新用户     \n\
   > del <username>  \t\t 删除一个用户	\n\
   > login <username>  \t\t 使 <username> 上线\n\
@@ -62,10 +69,11 @@ void printHelp()
   > logout <username>	 \t 使 <username> 下线\n\
   > logout /all  \t\t 使所有用户下线	\n\
   > list  \t\t\t 查看已保存的用户	\n\
-  > info <username>  \t\t 查看 <username> 的信息	\n\
-  > --debug  \t\t\t 进入 Debug 模式	\n\
-> ");
-
+  > info <username>  \t\t 查看 <username> 的信息	\n");
+	setColor("yellow");
+	printf("  > --debug  \t\t\t 进入 Debug 模式	\n");
+	setColor("white");
+	printf("> ");
 }
 void newUser(string command)
 {
@@ -291,11 +299,11 @@ void userInfo(string command)
 			setColor("cyan");
 			printf("%d", l[i].liveInfo.achieve);
 			setColor("white");
-			printf("  银瓜子：%d 金瓜子： ", l[i].liveInfo.achieve, l[i].liveInfo.silver);
+			printf("  银瓜子：%d 金瓜子： ", l[i].liveInfo.silver);
 			setColor("yellow");
 			printf("%d\n", l[i].liveInfo.gold);
 			setColor("cyan");
-			printf("  主站等级：%d (%d / %d) \n   距离升级：%d\n", l[i].avInfo.current_level, l[i].avInfo.next_exp, 
+			printf("  主站等级：%d (%d / %d) \n   距离升级：%d\n", l[i].avInfo.current_level, l[i].avInfo.current_exp, l[i].avInfo.next_exp, 
 				l[i].avInfo.next_exp - l[i].avInfo.current_exp);
 			setColor("pink");
 			printf("  直播站等级：%d (%d / %d) \n   距离升级：%d\n", l[i].liveInfo.user_level, 
@@ -336,19 +344,24 @@ int main(void)
         {
             return 0;
         }
+		else if (!command.compare("home"))
+		{
+			printHeader();
+			printf("\n> ");
+		}
         else if (!command.compare("/h"))
         {
             printHelp();
         }
-        else if (!command.compare("/help"))
+        else if (!command.compare("/help") || !command.compare("help"))
         {
             printHelp();
         }
-        else if (!command.compare("-h"))
+        else if (!command.compare("-h") || !command.compare("-H"))
         {
             printHelp();
         }
-        else if (!command.compare("h"))
+        else if (!command.compare("h") || !command.compare("H"))
         {
             printHelp();
         }
@@ -380,6 +393,10 @@ int main(void)
         {
             userList();
         }
+		else if (!command.compare("--debug"))
+		{
+			debugMode();
+		}
 		else if (!command.compare("\n"))
 		{
 			printf("> ");

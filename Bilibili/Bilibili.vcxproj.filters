@@ -93,7 +93,7 @@
     <ClInclude Include="Live.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Picture.h">
+    <ClInclude Include="CaptchaRecognition.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -113,7 +113,7 @@
     <ClCompile Include="Live.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Picture.cpp">
+    <ClCompile Include="CaptchaRecognition.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
