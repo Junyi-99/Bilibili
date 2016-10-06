@@ -10,12 +10,12 @@ std::vector<std::string> Founctions::split(std::string str, std::string pattern)
 	std::string::size_type pos;
 	std::vector<std::string> result;
 	str += pattern;//扩展字符串以方便操作
-	int size = str.size();
+	unsigned int size = str.size();
 
-	for (int i = 0; i<size; i++)
+	for (unsigned int i = 0; i<size; i++)
 	{
 		pos = str.find(pattern, i);
-		if (pos<size)
+		if (pos < size)
 		{
 			std::string s = str.substr(i, pos - i);
 			result.push_back(s);
@@ -192,6 +192,7 @@ wstring Founctions::HttpPostWithoutProp(const char* url, const char* postData, c
 	curl = curl_easy_init();
 	if (curl) {
 		curl_easy_setopt(curl, CURLOPT_URL, url);
+		curl_easy_setopt(curl, CURLOPT_POST, 1L);
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData);
 		curl_easy_setopt(curl, CURLOPT_COOKIEFILE, cookieFilePath);/* 设置发送的 Cookies */
 		curl_easy_setopt(curl, CURLOPT_COOKIEJAR, cookieFilePath);/* 设置接受的 Cookies */

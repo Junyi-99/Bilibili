@@ -3,7 +3,7 @@
 int Live::DoSign()
 {
 	wstring ret = f.HttpGetWithoutProp("http://live.bilibili.com/sign/doSign", cacheFile.c_str(), cookieFile.c_str());
-	wcout << ret << endl;
+	printf("\nIn -> DoSign: %s %s\n", to_string(f.GetTimeStamp()).c_str(), f.WstringToString(ret).c_str());
 	rapidjson::Document doc;
 	doc.Parse(f.WstringToString(ret).c_str());
 	if (!doc.IsObject())
@@ -27,8 +27,9 @@ int Live::FreeSilverGetCurrentTask(bili::FreeSilverTask &ct)
 	url.append(to_string(f.GetTimeStamp()));
 	cout << url << endl;
 	wstring ret = f.HttpGetWithoutProp(url.c_str(), cacheFile.c_str(), cookieFile.c_str());
-	wcout << ret << endl;
+	//wcout << ret << endl;
 	/*  {"code":0,"msg":"","data":{"minute":6,"silver":80,"time_start":1471700319,"time_end":1471700679}} */
+	printf("\nIn -> FreeSilverGetCurrentTask: %s %s\n", to_string(f.GetTimeStamp()).c_str(), f.WstringToString(ret).c_str());
 	rapidjson::Document doc;
 	doc.Parse(f.WstringToString(ret).c_str());
 	
@@ -45,8 +46,9 @@ int Live::FreeSilverGetCurrentTask(bili::FreeSilverTask &ct)
 
 int Live::Heart()
 {//-403 ·Ç·¨ÐÄÌø
-	wstring ret = f.HttpGetWithoutProp("http://live.bilibili.com/User/userOnlineHeart", cacheFile.c_str(), cookieFile.c_str());
+	wstring ret = f.HttpGetWithoutProp("http://live.bilibili.com/User/userOnlineHeart",  cacheFile.c_str(), cookieFile.c_str());
 	/* {"code":-403,"msg":"\u975e\u6cd5\u5fc3\u8df3","data":[1475575312,1475575146]} */
+	printf("\nIn -> Live.Heart: %s %s\n", to_string(f.GetTimeStamp()).c_str(), f.WstringToString(ret).c_str());
 	rapidjson::Document doc;
 	doc.Parse(f.WstringToString(ret).c_str());
 	if (!doc.IsObject())
@@ -105,21 +107,42 @@ int Live::SendGift(int giftID, int roomID, int num, bool coinType, int bagID)
 	return 0;
 }
 
+static size_t write_data2(void *ptr, size_t size, size_t nmemb, void *stream)
+{
+	size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
+	return written;
+}
+
 int Live::FreeSilverGetCaptcha()
 {
+	f.HttpGetWithoutProp("http://live-feed.bilibili.com/freeSilver/getCaptcha", captchaFile.c_str(), cookieFile.c_str());
 	return 0;
 }
 
 int Live::FreeSilverGet()
 {
-	return 0;
-}
-
-Live::Live()
-{
-}
-
-
-Live::~Live()
-{
+	FreeSilverGetCaptcha();
+	int r = f.getCaptchaValue(captchaFile.c_str());
+	if (r == -1)
+		return -1;
+	string url("http://live.bilibili.com/FreeSilver/getAward?time_start=");
+	url.append(to_string(currentTask.time_start));
+	url.append("&time_end=");
+	url.append(to_string(currentTask.time_end));
+	url.append("&captcha=");
+	url.append(to_string(r));
+	url.append("&_=");
+	url.append(to_string(f.GetTimeStamp()));
+	wstring ret = f.HttpGetWithoutProp(url.c_str(), cacheFile.c_str(), cookieFile.c_str());
+	printf("\nIn -> FreeSilverGet: %s %s\n", to_string(f.GetTimeStamp()).c_str(), f.WstringToString(ret).c_str());
+	rapidjson::Document doc;
+	doc.Parse(f.WstringToString(ret).c_str());
+	/* {"code":0,"msg":"ok","data":{"silver":37114,"awardSilver":80,"isEnd":0}} */
+	if (!doc.IsObject())
+		return -1;
+	if (!doc.HasMember("code"))
+		return -2;
+	if (!strcmp(doc["msg"].GetString(), "ok"))
+		return doc["data"]["awardSilver"].GetInt();
+	return -3;
 }

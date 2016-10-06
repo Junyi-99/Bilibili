@@ -82,9 +82,13 @@ bool cmp(vector<Point> &a, vector<Point> &b)//注意：本函数的参数的类型一定要与ve
 	Rect rc2 = boundingRect(b);
 	return rc1.x < rc2.x;//升序排列  
 }
-vector<Mat> splitCaptcha(const char* imgPath)
+int splitCaptcha(const char* imgPath, vector<Mat> &recv)
 {
 	Mat imgSrc = imread(imgPath, CV_LOAD_IMAGE_COLOR);
+	if (imgSrc.empty() || !imgSrc.data)
+	{
+		return -1;
+	}
 	Mat src_gray, dst;
 	cvtColor(imgSrc, src_gray, CV_BGR2GRAY);
 	threshold(src_gray, dst, 100, 255, CV_THRESH_BINARY_INV);
@@ -93,18 +97,22 @@ vector<Mat> splitCaptcha(const char* imgPath)
 	vector<Mat> result;
 	findContours(dst, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 	sort(contours.begin(), contours.end(), cmp);
-	for (int i = 0; i<contours.size(); i++) {
+	for (unsigned int i = 0; i < contours.size(); i++) {
 		Rect rc = boundingRect(contours[i]);
 		Mat temp(src_gray, rc);
 		result.push_back(temp);
 	}
-	return result;
+	recv = result;
+	return 0;
 }
 int CaptchaRecognition::getCaptchaValue(const char* captchaPath)
 {
-	vector<Mat> result = splitCaptcha(captchaPath);
+	vector<Mat> result;
+	int ret = splitCaptcha(captchaPath, result);
+	if (ret == -1)
+		return -1;
 	int res[5] = { 0 };
-	for (int i = 0; i < result.size(); i++)
+	for (unsigned int i = 0; i < result.size(); i++)
 	{
 		//imshow(to_string(i), result[i]);
 		res[i] = findNumber(result[i]);

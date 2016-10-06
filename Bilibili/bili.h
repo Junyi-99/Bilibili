@@ -5,8 +5,8 @@
 #include <fstream>  
 #include <streambuf>  
 using namespace std;
-
-
+/* 此类仅用来获取 Cookies 等信息 */
+/* 请在 Live 类的析构函数里删除缓存文件 */
 class bili
 {
 public:
@@ -81,14 +81,15 @@ public:
 	void setLoginStatus(bool status) { isLogin_ = status; };
 	wstring GetUserNameByUID(int UID);
 	string GetUsername()const { return username_; };
-	string GetUname()const { return uname; };
+	string GetNickname()const { return uname; };
+	string GetCaptchaFilePath()const { return captchaFile; };
 	bili() { isLogin_ = false; };
-	~bili();
-	
+	~bili() {};
 protected:
 	int GetMasterID(int liveRoomID);//Get RUID
 	string uname;
 	string username_;
+	string captchaFile;
 	bool isLogin_;
 	string CheckLogin();
 	string cookieFile;

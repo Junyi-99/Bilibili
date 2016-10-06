@@ -16,8 +16,9 @@ int bili::Login(const string username, const string password)
 	string postData = "userid=" + username + "&pwd=" + f.UrlEncode(password) + "&captcha=&keep=1";
 	cookieFile = username + ".bili.cookie";
 	cacheFile = username + ".bili.cache";
+	captchaFile= username + ".bili.captcha";
 	wstring ret = f.HttpPostWithoutProp("https://passport.bilibili.com/ajax/miniLogin/login", postData.c_str(), cacheFile.c_str(), cookieFile.c_str());
-
+	printf("\nIn -> Login %s %s\n", to_string(f.GetTimeStamp()).c_str(), f.WstringToString(ret).c_str());
 	rapidjson::Document doc;
 	doc.Parse(f.WstringToString(ret).c_str());
 
@@ -52,6 +53,7 @@ string bili::CheckLogin()
 int bili::GetUserInfoLive(LiveInfo &l)
 {//获取Bilibili直播站用户信息
 	string ret = CheckLogin();
+	printf("\nIn -> GetUserInfoLive %s\n", ret.c_str());
 	rapidjson::Document doc;
 	doc.Parse(ret.c_str());
 	if (!doc.IsObject())
@@ -107,6 +109,7 @@ int bili::GetUserInfoLive(LiveInfo &l)
 int bili::GetUserInfoAV(AVInfo &a)
 {//获取Bilibili直播站用户信息
 	wstring ret = f.HttpGetWithoutProp("https://account.bilibili.com/home/userInfo", cacheFile.c_str(), cookieFile.c_str());
+	printf("\nIn -> GetUserInfoAV %s %s\n", to_string(f.GetTimeStamp()).c_str(), f.WstringToString(ret).c_str());
 	rapidjson::Document doc;
 	doc.Parse(f.WstringToString(ret).c_str());
 	if (!doc.IsObject())
@@ -147,6 +150,7 @@ int bili::GetUserInfoAV(AVInfo &a)
 int bili::GetSignInfo(SignInfo &s)
 {//获取签到信息
 	wstring ret = f.HttpGetWithoutProp("http://live.bilibili.com/sign/GetSignInfo", cacheFile.c_str(), cookieFile.c_str());
+	printf("\nIn -> GetSignInfo %s %s\n", to_string(f.GetTimeStamp()).c_str(), f.WstringToString(ret).c_str());
 	rapidjson::Document doc;
 	doc.Parse(f.WstringToString(ret).c_str());
 	if (!doc.IsObject())
@@ -209,6 +213,7 @@ int bili::GetMasterID(int liveRoomID)
 int bili::ExchangeSilver2Coin()
 {//银瓜子换硬币
 	wstring ret = f.HttpPostWithoutProp("http://live.bilibili.com/exchange/silver2coin", "", cacheFile.c_str(), cookieFile.c_str());
+	printf("\nIn -> ExchangeSilver2Coin %s %s\n", to_string(f.GetTimeStamp()).c_str(), f.WstringToString(ret).c_str());
 	rapidjson::Document doc;
 	doc.Parse(f.WstringToString(ret).c_str());
 	if (!doc.IsObject())
@@ -242,9 +247,4 @@ wstring bili::GetUserNameByUID(int UID)
 	url.append(to_string(UID));
 	wstring ret = f.HttpGetWithoutProp(url.c_str(), cacheFile.c_str(), cookieFile.c_str());
 	return f.findText(ret, L"<title>", L"的个人空间 - 哔哩哔哩");
-}
-
-
-bili::~bili()
-{
 }

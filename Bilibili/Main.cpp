@@ -4,14 +4,27 @@
 #include "Live.h"
 #include "Founctions.h"
 #include <vector>
+#include "Thread.h"
+//编译OpenSSL的时候，用低版本编译，比如1.0.1o
+//https://github.com/openssl/openssl/releases/tag/OpenSSL_1_0_1o
+//需要编译 libcurl - OpenSSL 版本的静态库
+
+const int MAX_USER = 50;
 using namespace std;
 vector <Live> l;
 Founctions f;
+Live newLive;
+
 void debugMode()
 {
-	cout << f.getCaptchaValue("C:\\Users\\Junyi\\Desktop\\1.jpg") << endl;
-	cout << f.getCaptchaValue("C:\\Users\\Junyi\\Desktop\\2.jpg") << endl;
-	cout << f.getCaptchaValue("C:\\Users\\Junyi\\Desktop\\3.jpg") << endl;
+	
+	//l[0].FreeSilverGetCaptcha();
+	//cout << "验证码识别结果：" << f.getCaptchaValue(l[0].GetCaptchaFilePath().c_str()) << endl;
+	//cout << f.getCaptchaValue("C:\\Users\\Junyi\\Desktop\\1.jpg") << endl;
+	//cout << f.getCaptchaValue("C:\\Users\\Junyi\\Desktop\\2.jpg") << endl;
+	//cout << f.getCaptchaValue("C:\\Users\\Junyi\\Desktop\\3.jpg") << endl;
+	tmd_create();
+	//cout << tmd::getSize();
 	printf("> ");
 }
 void setColor(const char* color)
@@ -56,6 +69,9 @@ void printHeader()
   / ____ \\\\__ \\__ \\ \\__ \\ || (_| | | | | |_ \n\
  /_/    \\_\\___/___/_|___/\\__\\__,_|_| |_|\\__|\n\
 		\n");
+	setColor("default");
+	printf("想来肛我吗！！！！哈哈哈哈哈来啊\n");
+	setColor("white");
 }
 void printHelp()
 {
@@ -77,14 +93,13 @@ void printHelp()
 }
 void newUser(string command)
 {
-	Live newLive;
     vector<string> result = f.split(command, " ");
     if (result.size() != 3)
     {
         printf("输入格式不正确！\n> ");
-        return;
+		return;
     }
-	for (int i = 0; i < l.size(); i++)
+	for (unsigned int i = 0; i < l.size(); i++)
 	{//判重（其实用 map<Live> 也行啊 捂脸）
 		if (l[i].GetUsername().compare(result[1]) == 0)
 		{
@@ -96,19 +111,27 @@ void newUser(string command)
 		}
 	}
 
-    int ret = 0;
-	
-	ret = newLive.Login(result[1], result[2]);
+	if (l.size() == 50)
+	{
+		setColor("yellow");
+		printf("已存在 %d 个用户，不能再添加了！\n", MAX_USER);
+		setColor("white");
+		printf("> ");
+		return;
+	}
+	l.push_back(newLive);//先让他进去
+    int ret = l.back().Login(result[1], result[2]);
     if (ret == 0)
     {
 		setColor("green");
         printf("登陆成功！正在刷新用户信息\n");
-        newLive.FreshUserInfo();
-		l.push_back(newLive);
+		l.back().FreshUserInfo();
         printf("用户信息刷新完成！\n");
     }
     else
     {
+		/*1 请求登陆失败 -626 用户不存在 -627 密码错误 -105 刚改完密码无法使用此登录方式 否则返回未知代码 */
+		l.pop_back();//弹出刚才进入 vector 的元素
 		setColor("red");
         if (ret == -626)
             printf("登录失败：用户不存在\n");
@@ -131,7 +154,7 @@ void loginUser(string command)
 		return;
 	}
 	setColor("yellow");
-	for (int i = 0; i < l.size(); i++)
+	for (unsigned int i = 0; i < l.size(); i++)
 	{
 		if (result[1].compare("/all") == 0)
 		{
@@ -173,7 +196,7 @@ void logoutUser(string command)
 		return;
 	}
 	setColor("yellow");
-	for (int i = 0; i < l.size(); i++)
+	for (unsigned int i = 0; i < l.size(); i++)
 	{
 		if (result[1].compare("/all") == 0)
 		{
@@ -242,11 +265,11 @@ void delUser(string command)
 void userList()
 {
     printf("%-20s%-20s%-20s\n", "用户名", "昵称", "状态");
-    for (int i = 0; i < l.size(); i++)
+    for (unsigned int i = 0; i < l.size(); i++)
     {
         string username, uname;
         username = l[i].GetUsername();
-        uname = l[i].GetUname();
+        uname = l[i].GetNickname();
 		setColor("cyan");
 		printf("%-20s", username.c_str());
 		setColor("pink");
@@ -275,7 +298,7 @@ void userInfo(string command)
 		printf("输入格式不正确！\n> ");
 		return;
 	}
-	for (int i = 0; i < l.size(); i++)
+	for (unsigned int i = 0; i < l.size(); i++)
 	{
 		if (l[i].GetUsername().compare(result[1]) == 0)
 		{
@@ -307,7 +330,7 @@ void userInfo(string command)
 				l[i].avInfo.next_exp - l[i].avInfo.current_exp);
 			setColor("pink");
 			printf("  直播站等级：%d (%d / %d) \n   距离升级：%d\n", l[i].liveInfo.user_level, 
-				l[i].liveInfo.user_next_intimacy, l[i].liveInfo.user_next_intimacy, l[i].liveInfo.user_next_intimacy - l[i].liveInfo.user_intimacy);
+				l[i].liveInfo.user_intimacy, l[i].liveInfo.user_next_intimacy, l[i].liveInfo.user_next_intimacy - l[i].liveInfo.user_intimacy);
 			setColor("green");
 			printf("  主播等级：%d (%d / %d) \n   距离升级：%d\n", l[i].liveRoomInfo.level, 
 				l[i].liveRoomInfo.currentExp, l[i].liveRoomInfo.allExp, l[i].liveRoomInfo.allExp - l[i].liveRoomInfo.currentExp);
@@ -322,17 +345,6 @@ void userInfo(string command)
 }
 int main(void)
 {
-	
-    /*1 请求登陆失败 -626 用户不存在 -627 密码错误 -105 刚改完密码无法使用此登录方式 否则返回未知代码 */
-    /*Live l;
-    Live::LiveInfo li;
-    Live::SignInfo si;
-    Live::LiveRoomInfo lr;
-    l.Login("15552878163", "Kt!OW0n@");
-    cout << l.FreshUserInfo() << endl;*/
-    //cout << l.DoSign() << endl;
-    //cout << l.GetUserID() << endl;
-    //cout << l.GetToken() << endl;
 	setColor("white");
     printHeader();
     printf("\n欢迎使用 Bilibili 助手\n输入 /help 查看帮助\n> ");
@@ -403,8 +415,6 @@ int main(void)
 		}
         else { printf("未知命令 输入 /help 查看帮助\n> "); }
     }
-    
-    
     system("pause");
     return 0;
 }
